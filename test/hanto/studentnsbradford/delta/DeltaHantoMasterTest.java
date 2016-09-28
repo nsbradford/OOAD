@@ -1,3 +1,6 @@
+/**
+ * @author Nicholas
+ */
 package hanto.studentnsbradford.delta;
 
 import static hanto.common.HantoPieceType.BUTTERFLY;

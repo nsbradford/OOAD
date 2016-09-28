@@ -1,11 +1,12 @@
 /**
- * FlyMoveTest.java
+ * @author Nicholas
  */
 
 package hanto.studentnsbradford.common.movement;
 
 import static hanto.common.HantoPieceType.BUTTERFLY;
 import static hanto.common.HantoPieceType.SPARROW;
+import static hanto.common.HantoPieceType.CRAB;
 import static hanto.common.HantoPlayerColor.BLUE;
 import static org.junit.Assert.*;
 
@@ -48,7 +49,7 @@ public class FlyMoveTest {
 	public void setup()
 	{
 		// By default, blue moves first.
-		game = factory.makeHantoGame(HantoGameID.DELTA_HANTO, HantoPlayerColor.BLUE);
+		game = factory.makeHantoGame(HantoGameID.EPSILON_HANTO, HantoPlayerColor.BLUE);
 	}
 	
 	private void testSetup_normal() throws HantoException{
@@ -65,6 +66,21 @@ public class FlyMoveTest {
 		game.makeMove(SPARROW, 	null, Coord(2, 0));
 	}
 
+	private void testSetup_yStraight() throws HantoException {
+		game.makeMove(BUTTERFLY, null, Coord(0, 0));
+		game.makeMove(BUTTERFLY, null, Coord(0, 1));
+		game.makeMove(SPARROW, null, Coord(0, -1));
+		game.makeMove(SPARROW, null, Coord(0, 2));
+	}
+	
+	private void testSetup_zStraight() throws HantoException {
+		game.makeMove(BUTTERFLY, null, Coord(0, 0));
+		game.makeMove(BUTTERFLY, null, Coord(-1, 1));
+		game.makeMove(SPARROW, null, Coord(1, -1));
+		game.makeMove(SPARROW, null, Coord(-2, 2));
+	}
+	
+	
 	//=============================================================================================
 	// Valid flying
 	
@@ -72,7 +88,6 @@ public class FlyMoveTest {
 	public void validFly_blueFlyForSecondMove() throws HantoException 
 	{
 		testSetup_normal();
-		
 		game.makeMove(SPARROW, Coord(-1, 0), Coord(3, 0));
 		
 		final HantoPiece p = game.getPieceAt(Coord(3, 0));
@@ -87,7 +102,6 @@ public class FlyMoveTest {
 		game.makeMove(SPARROW, null, Coord(1, 0));
 		game.makeMove(SPARROW, null, Coord(-1, 0));
 		game.makeMove(SPARROW, null, Coord(2, 0));
-		
 		game.makeMove(SPARROW, Coord(-1, 0), Coord(3, 0));
 		
 		final HantoPiece p = game.getPieceAt(Coord(3, 0));
@@ -96,7 +110,27 @@ public class FlyMoveTest {
 		assertEquals(SPARROW, p.getType());
 	}
 	
-
+	@Test
+	public void validFly_yAxis() throws HantoException {
+		testSetup_yStraight();
+		game.makeMove(SPARROW, Coord(0, -1), Coord(0, 3));
+		
+		final HantoPiece p = game.getPieceAt(Coord(0, 3));
+		assertNull(game.getPieceAt(Coord(0, -1)));
+		assertEquals(BLUE, p.getColor());
+		assertEquals(SPARROW, p.getType());
+	}
+	
+	@Test
+	public void validFly_zAxis() throws HantoException {
+		testSetup_zStraight();
+		game.makeMove(SPARROW, Coord(1, -1), Coord(-3, 3));
+		
+		final HantoPiece p = game.getPieceAt(Coord(-3, 3));
+		assertNull(game.getPieceAt(Coord(1, -1)));
+		assertEquals(BLUE, p.getColor());
+		assertEquals(SPARROW, p.getType());
+	}
 
 	//=============================================================================================
 	// Invalid walk: silly arguments
@@ -206,7 +240,47 @@ public class FlyMoveTest {
 	}
 	
 	//=============================================================================================
-	// Invalid flying: destination out of range TODO
+	// Invalid flying: destination out of range
 	
-	// TODO
+	@Test
+	public void invalidFlyRange_straightX() throws HantoException 
+	{
+		testSetup_normal();
+		game.makeMove(CRAB, null, Coord(-2, 0));
+		try{
+			game.makeMove(SPARROW, Coord(2, 0), Coord(-3, 0));
+			assertTrue(messageNoException, false); // execution shouldn't reach here
+		}
+		catch (HantoException e){
+			assertEquals(e.getMessage(), BaseHantoGame.messageInvalidMove);
+		}
+	}
+	
+	@Test
+	public void invalidFlyRange_straightY() throws HantoException 
+	{
+		testSetup_yStraight();
+		game.makeMove(CRAB, null, Coord(0, -2));
+		try{
+			game.makeMove(SPARROW, Coord(0, 2), Coord(0, -3));
+			assertTrue(messageNoException, false); // execution shouldn't reach here
+		}
+		catch (HantoException e){
+			assertEquals(e.getMessage(), BaseHantoGame.messageInvalidMove);
+		}
+	}
+	
+	@Test
+	public void invalidFlyRange_straightZ() throws HantoException 
+	{
+		testSetup_zStraight();
+		game.makeMove(CRAB, null, Coord(2, -2));
+		try{
+			game.makeMove(SPARROW, Coord(-2, 2), Coord(3, -3));
+			assertTrue(messageNoException, false); // execution shouldn't reach here
+		}
+		catch (HantoException e){
+			assertEquals(e.getMessage(), BaseHantoGame.messageInvalidMove);
+		}
+	}
 }

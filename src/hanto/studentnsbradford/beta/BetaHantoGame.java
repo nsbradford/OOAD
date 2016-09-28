@@ -1,15 +1,6 @@
-/*******************************************************************************
- * This files was developed for CS4233: Object-Oriented Analysis & Design.
- * The course was taken at Worcester Polytechnic Institute.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Copyright ©2016 Gary F. Pollice
- *******************************************************************************/
-
+/**
+ * @author Nicholas
+ */
 package hanto.studentnsbradford.beta;
 
 import static hanto.common.HantoPieceType.BUTTERFLY;
@@ -39,7 +30,6 @@ public class BetaHantoGame extends BaseHantoGame
 		super(movesFirst);
 		isResignationAllowed = false;
 		maxMovesInGame = 12;
-		numMovesBeforeButterfly = 6;
 		startingPieces = new HantoPieceType[] {
 				BUTTERFLY,
 				SPARROW,
@@ -56,10 +46,9 @@ public class BetaHantoGame extends BaseHantoGame
 	}
 	
 	@Override
-	protected void validateMove(HantoPieceImpl piece, HantoCoordinateImpl source,
+	protected void validateMoveForPiece(HantoPieceImpl piece, HantoCoordinateImpl source,
 			HantoCoordinateImpl destination) throws HantoException
 	{
-		super.standardValidation(piece, source, destination);
 		if (!(source == null)){
 			throw new HantoException(messageInvalidSource);
 		}
@@ -69,4 +58,5 @@ public class BetaHantoGame extends BaseHantoGame
 			throw new HantoException(messageInvalidDestination);
 		}
 	}
+
 }

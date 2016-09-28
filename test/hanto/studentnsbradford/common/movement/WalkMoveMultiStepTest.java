@@ -1,5 +1,4 @@
 /**
- * WalkMoveMultiStepTest.java
  * @author Nicholas
  */
 package hanto.studentnsbradford.common.movement;

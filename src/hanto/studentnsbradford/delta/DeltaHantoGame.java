@@ -1,5 +1,5 @@
 /**
- * 
+ * @author Nicholas
  */
 package hanto.studentnsbradford.delta;
 
@@ -27,18 +27,16 @@ public class DeltaHantoGame extends BaseHantoGame {
 	 */
 	public DeltaHantoGame(HantoPlayerColor movesFirst) {
 		super(movesFirst);
-		maxMovesInGame = Integer.MAX_VALUE; // "infinite"
-		numMovesBeforeButterfly = 6;
 		startingPieces = new HantoPieceType[] {
-				HantoPieceType.BUTTERFLY,
-				HantoPieceType.SPARROW,
-				HantoPieceType.SPARROW,
-				HantoPieceType.SPARROW,
-				HantoPieceType.SPARROW,
-				HantoPieceType.CRAB,
-				HantoPieceType.CRAB,
-				HantoPieceType.CRAB,
-				HantoPieceType.CRAB
+				BUTTERFLY,
+				SPARROW,
+				SPARROW,
+				SPARROW,
+				SPARROW,
+				CRAB,
+				CRAB,
+				CRAB,
+				CRAB
 		};
 		playerInactivePieces.put(HantoPlayerColor.BLUE, 
 				new ArrayList<HantoPieceType>(Arrays.asList(startingPieces))); 
@@ -50,4 +48,5 @@ public class DeltaHantoGame extends BaseHantoGame {
 		moveValidators.get(CRAB).add(new WalkMoveValidator(3));
 	}
 
+	
 }

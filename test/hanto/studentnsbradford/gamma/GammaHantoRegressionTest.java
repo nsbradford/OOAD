@@ -1,8 +1,7 @@
 /**
- * 
+ * @author Nicholas
  */
 package hanto.studentnsbradford.gamma;
-
 
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;

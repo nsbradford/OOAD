@@ -1,5 +1,5 @@
 /**
- * 
+ * @author Nicholas
  */
 package hanto.studentnsbradford.gamma;
 
@@ -29,7 +29,6 @@ public class GammaHantoGame extends BaseHantoGame {
 		super(movesFirst);
 		isResignationAllowed = false;
 		maxMovesInGame = 40;
-		numMovesBeforeButterfly = 6;
 		startingPieces = new HantoPieceType[] {
 				BUTTERFLY,
 				SPARROW,
@@ -47,4 +46,5 @@ public class GammaHantoGame extends BaseHantoGame {
 		moveValidators.get(BUTTERFLY).add(new WalkMoveValidator());
 		moveValidators.get(SPARROW).add(new WalkMoveValidator());
 	}
+
 }

@@ -1,10 +1,11 @@
 /**
  * @author Nicholas
  */
-package hanto.studentnsbradford.delta;
+package hanto.studentnsbradford.epsilon;
 
 import static hanto.common.HantoPieceType.BUTTERFLY;
 import static hanto.common.HantoPieceType.SPARROW;
+import static hanto.common.HantoPieceType.CRAB;
 import static hanto.common.HantoPlayerColor.BLUE;
 import static hanto.common.HantoPlayerColor.RED;
 import static hanto.common.MoveResult.OK;
@@ -26,8 +27,10 @@ import hanto.studentnsbradford.HantoGameFactory;
 import hanto.studentnsbradford.common.BaseHantoGame;
 import hanto.studentnsbradford.common.HantoCoordinateImpl;
 import hanto.studentnsbradford.common.TestHantoCoordinate;
+import hanto.studentnsbradford.delta.DeltaHantoGame;
 
-public class DeltaHantoRegressionTest {
+public class EpsilonHantoRegressionTest {
+
 
 	// Helper methods
 	private HantoCoordinate Coord(int x, int y)
@@ -55,7 +58,7 @@ public class DeltaHantoRegressionTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		game = factory.makeHantoGame(HantoGameID.DELTA_HANTO, HantoPlayerColor.BLUE);
+		game = factory.makeHantoGame(HantoGameID.EPSILON_HANTO, HantoPlayerColor.BLUE);
 	}
 	
 	//=============================================================================================
@@ -232,14 +235,14 @@ public class DeltaHantoRegressionTest {
 	@Test	// 13
 	public void invalidMove_blueDoesNotPlaceButterflyByFourthMove() throws HantoException
 	{
-		game.makeMove(SPARROW, null, Coord(0, 0));	// Move 1
+		game.makeMove(CRAB, null, Coord(0, 0));	// Move 1
 		game.makeMove(BUTTERFLY, null, Coord(1, 0));
-		game.makeMove(SPARROW, null, Coord(-1, 0));	// Move 2
-		game.makeMove(SPARROW, null, Coord(2, 0));
-		game.makeMove(SPARROW, null, Coord(-2, 0));	// Move 3
-		game.makeMove(SPARROW, null, Coord(3, 0));	
+		game.makeMove(CRAB, null, Coord(-1, 0));	// Move 2
+		game.makeMove(CRAB, null, Coord(2, 0));
+		game.makeMove(CRAB, null, Coord(-2, 0));	// Move 3
+		game.makeMove(CRAB, null, Coord(3, 0));	
 		try {
-			game.makeMove(SPARROW, null, Coord(-3, 0)); // Move 4
+			game.makeMove(CRAB, null, Coord(-3, 0)); // Move 4
 			assertTrue(messageNoException, false); // execution shouldn't reach here
 		}
 		catch (HantoException e){
@@ -251,14 +254,14 @@ public class DeltaHantoRegressionTest {
 	public void invalidMove_redDoesNotPlaceButterflyByFourthTurn() throws HantoException
 	{
 		game.makeMove(BUTTERFLY, null, Coord(0, 0));	// Move 1
-		game.makeMove(SPARROW, null, Coord(1, 0));
-		game.makeMove(SPARROW, null, Coord(-1, 0));	// Move 2
-		game.makeMove(SPARROW, null, Coord(2, 0));
-		game.makeMove(SPARROW, null, Coord(-2, 0));	// Move 3
-		game.makeMove(SPARROW, null, Coord(3, 0));
-		game.makeMove(SPARROW, null, Coord(-3, 0));	// Move 4
+		game.makeMove(CRAB, null, Coord(1, 0));
+		game.makeMove(CRAB, null, Coord(-1, 0));	// Move 2
+		game.makeMove(CRAB, null, Coord(2, 0));
+		game.makeMove(CRAB, null, Coord(-2, 0));	// Move 3
+		game.makeMove(CRAB, null, Coord(3, 0));
+		game.makeMove(CRAB, null, Coord(-3, 0));	// Move 4
 		try {
-			game.makeMove(SPARROW, null, Coord(0, -4));
+			game.makeMove(CRAB, null, Coord(0, -4));
 			assertTrue(messageNoException, false); // execution shouldn't reach here
 		}
 		catch (HantoException e){
@@ -274,15 +277,15 @@ public class DeltaHantoRegressionTest {
 	{
 		game.makeMove(BUTTERFLY, null, Coord(0, 0)); // move 1
 		game.makeMove(BUTTERFLY, null, Coord(1, 0));
-		game.makeMove(SPARROW, null, Coord(0, -1)); // move 2
-		game.makeMove(SPARROW, null, Coord(1, 1));
-		game.makeMove(SPARROW, null, Coord(-1, 0)); // move 3
-		game.makeMove(SPARROW, null, Coord(2, -1));
-		game.makeMove(SPARROW, null, Coord(-1, 1)); // move 4
-		game.makeMove(SPARROW, Coord(1, 1), Coord(0, 1));
-		game.makeMove(SPARROW, null, Coord(-1, -1)); // move 5
+		game.makeMove(CRAB, null, Coord(0, -1)); // move 2
+		game.makeMove(CRAB, null, Coord(1, 1));
+		game.makeMove(CRAB, null, Coord(-1, 0)); // move 3
+		game.makeMove(CRAB, null, Coord(2, -1));
+		game.makeMove(CRAB, null, Coord(-1, 1)); // move 4
+		game.makeMove(CRAB, Coord(1, 1), Coord(0, 1));
+		game.makeMove(CRAB, null, Coord(-1, -1)); // move 5
 		assertEquals(MoveResult.RED_WINS, 
-				game.makeMove(SPARROW, Coord(2, -1), Coord(1, -1)));
+				game.makeMove(CRAB, Coord(2, -1), Coord(1, -1)));
 	}
 	
 	@Test	// 16
@@ -290,14 +293,14 @@ public class DeltaHantoRegressionTest {
 	{
 		game.makeMove(BUTTERFLY, null, Coord(0, 0)); // move 1
 		game.makeMove(BUTTERFLY, null, Coord(1, 0));
-		game.makeMove(SPARROW, null, Coord(0, -1)); // move 2
-		game.makeMove(SPARROW, null, Coord(1, 1));
-		game.makeMove(SPARROW, null, Coord(-1, 0)); // move 3
-		game.makeMove(SPARROW, null, Coord(2, 0));
-		game.makeMove(SPARROW, null, Coord(-1, 1)); // move 4
-		game.makeMove(SPARROW, null, Coord(2, -1));
-		game.makeMove(SPARROW, Coord(-1, 1), Coord(0, 1)); // move 5
-		game.makeMove(SPARROW, Coord(2, -1), Coord(1, -1));
+		game.makeMove(CRAB, null, Coord(0, -1)); // move 2
+		game.makeMove(CRAB, null, Coord(1, 1));
+		game.makeMove(CRAB, null, Coord(-1, 0)); // move 3
+		game.makeMove(CRAB, null, Coord(2, 0));
+		game.makeMove(CRAB, null, Coord(-1, 1)); // move 4
+		game.makeMove(CRAB, null, Coord(2, -1));
+		game.makeMove(CRAB, Coord(-1, 1), Coord(0, 1)); // move 5
+		game.makeMove(CRAB, Coord(2, -1), Coord(1, -1));
 		assertEquals(MoveResult.RED_WINS, game.makeMove(SPARROW, null, Coord(-1, 1)));
 	}
 
@@ -306,15 +309,15 @@ public class DeltaHantoRegressionTest {
 	public void gameEnd_moveAfterGameIsOver() throws HantoException{
 		game.makeMove(BUTTERFLY, null, Coord(0, 0)); // move 1
 		game.makeMove(BUTTERFLY, null, Coord(1, 0));
-		game.makeMove(SPARROW, null, Coord(0, -1)); // move 2
-		game.makeMove(SPARROW, null, Coord(1, 1));
-		game.makeMove(SPARROW, null, Coord(-1, 0)); // move 3
-		game.makeMove(SPARROW, null, Coord(2, 0));
-		game.makeMove(SPARROW, null, Coord(-1, 1)); // move 4
-		game.makeMove(SPARROW, null, Coord(2, -1));
-		game.makeMove(SPARROW, Coord(-1, 1), Coord(0, 1)); // move 5
-		game.makeMove(SPARROW, Coord(2, -1), Coord(1, -1));
-		assertEquals(MoveResult.RED_WINS, game.makeMove(SPARROW, null, Coord(-1, 1)));
+		game.makeMove(CRAB, null, Coord(0, -1)); // move 2
+		game.makeMove(CRAB, null, Coord(1, 1));
+		game.makeMove(CRAB, null, Coord(-1, 0)); // move 3
+		game.makeMove(CRAB, null, Coord(2, 0));
+		game.makeMove(CRAB, null, Coord(-1, 1)); // move 4
+		game.makeMove(CRAB, null, Coord(2, -1));
+		game.makeMove(CRAB, Coord(-1, 1), Coord(0, 1)); // move 5
+		game.makeMove(CRAB, Coord(2, -1), Coord(1, -1));
+		assertEquals(MoveResult.RED_WINS, game.makeMove(CRAB, null, Coord(-1, 1)));
 		try{
 			game.makeMove(BUTTERFLY, null, Coord(-1, -1));
 			assertTrue(messageNoException, false); // execution shouldn't reach here
@@ -329,23 +332,66 @@ public class DeltaHantoRegressionTest {
 	{
 		game.makeMove(BUTTERFLY, null, Coord(0, 0)); // move 1
 		game.makeMove(BUTTERFLY, null, Coord(1, 0));
-		game.makeMove(SPARROW, null, Coord(0, -1)); // move 2
-		game.makeMove(SPARROW, null, Coord(1, 1));
-		game.makeMove(SPARROW, null, Coord(-1, 0)); // move 3
-		game.makeMove(SPARROW, null, Coord(2, 0));
-		game.makeMove(SPARROW, null, Coord(-1, 1)); // move 4
-		game.makeMove(SPARROW, null, Coord(2, -1));
-		game.makeMove(SPARROW, null, Coord(-1, 2)); // move 5
-		game.makeMove(SPARROW, null, Coord(2, -2));
-		game.makeMove(SPARROW, Coord(-1, 2), Coord(0, 1)); // move 6
+		game.makeMove(CRAB, null, Coord(0, -1)); // move 2
+		game.makeMove(CRAB, null, Coord(1, 1));
+		game.makeMove(CRAB, null, Coord(-1, 0)); // move 3
+		game.makeMove(CRAB, null, Coord(2, 0));
+		game.makeMove(CRAB, null, Coord(-1, 1)); // move 4
+		game.makeMove(CRAB, null, Coord(2, -1));
+		game.makeMove(CRAB, null, Coord(-1, 2)); // move 5
+		game.makeMove(CRAB, null, Coord(2, -2));
+		game.makeMove(CRAB, Coord(-1, 2), Coord(0, 1)); // move 6
 		assertEquals(MoveResult.DRAW, 
-				game.makeMove(SPARROW, Coord(2, -2), Coord(1, -1)));
+				game.makeMove(CRAB, Coord(2, -2), Coord(1, -1)));
+	}
+	
+
+	//=============================================================================================
+	// Moving a piece to itself throws exception
+	
+	@Test	// 19
+	public void invalidMove_sourceEqualsDestination() throws HantoException
+	{
+		game.makeMove(BUTTERFLY, null, BaseHantoGame.origin);
+		game.makeMove(BUTTERFLY, null, Coord(1, 0));
+		try{
+			game.makeMove(BUTTERFLY, BaseHantoGame.origin, BaseHantoGame.origin);
+			assertTrue(messageNoException, false); // execution shouldn't reach here
+		}
+		catch (HantoException e){
+			assertEquals(BaseHantoGame.messageInvalidDestination, e.getMessage());
+		}
+	}
+		
+	//=============================================================================================
+	// Null destination move throws exception
+	
+	@Test	// 20
+	public void invalidMove_nullDestination() throws HantoException
+	{
+		game.makeMove(BUTTERFLY, null, BaseHantoGame.origin);
+		game.makeMove(BUTTERFLY, null, Coord(1, 0));
+		try{
+			game.makeMove(BUTTERFLY, BaseHantoGame.origin, null);
+			assertTrue(messageNoException, false); // execution shouldn't reach here
+		}
+		catch (HantoException e){
+			assertEquals(BaseHantoGame.messageNullDestination, e.getMessage());
+		}
+		
+		try{
+			game.makeMove(BUTTERFLY, null, null);
+			assertTrue(messageNoException, false); // execution shouldn't reach here
+		}
+		catch (HantoException e){
+			assertEquals(BaseHantoGame.messageNullDestination, e.getMessage());
+		}
 	}
 	
 	//=============================================================================================
 	// Unit tests
 	
-	@Test	// 19
+	@Test	// 21
 	public void unitCheck_getPrintableBoard() throws HantoException{
 		assertNotNull(game.getPrintableBoard());
 		assertEquals(MoveResult.OK, game.makeMove(HantoPieceType.BUTTERFLY, null, Coord(0, 0)));
@@ -353,7 +399,7 @@ public class DeltaHantoRegressionTest {
 		assertNotNull(game.getPrintableBoard());
 	}
 	
-	@Test	// 20
+	@Test	// 22
 	public void unitCheck_isAdjacentToOccupiedHex()
 	{
 		final HantoCoordinate loc = Coord(0, 0);
@@ -372,4 +418,5 @@ public class DeltaHantoRegressionTest {
 		assertFalse(HantoCoordinateImpl.isAdjacentToHex(loc, Coord(-1, -1)));
 	}
 	
+
 }

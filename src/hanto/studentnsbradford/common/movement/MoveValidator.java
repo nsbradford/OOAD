@@ -1,7 +1,6 @@
 /**
- * @author Nicholas S. Bradford
+ * @author Nicholas
  */
-
 package hanto.studentnsbradford.common.movement;
 
 import java.util.HashMap;
@@ -59,7 +58,6 @@ public abstract class MoveValidator {
 		finalBoard.remove(source);
 		finalBoard.put(destination, new HantoPieceImpl(color, pieceType));
 		
-		// split up into if-else for debugging
 		return !(	source == null ||
 					!board.containsKey(source) ||
 					board.containsKey(destination) ||

@@ -1,15 +1,6 @@
-/*******************************************************************************
- * This files was developed for CS4233: Object-Oriented Analysis & Design.
- * The course was taken at Worcester Polytechnic Institute.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Copyright ©2015 Gary F. Pollice
- *******************************************************************************/
-
+/**
+ * @author Nicholas
+ */
 package hanto.studentnsbradford.common;
 
 import java.util.HashSet;
@@ -101,9 +92,68 @@ public class HantoCoordinateImpl implements HantoCoordinate
 	}
 	
 	//=========================================================================================
-	// Adjacent locations
+	// Distance and Direction
 	
+	/**
+	 * Get the distance between two coordinates on the hex grid.
+	 * Use explanation for turning hex into 3D from:
+	 * 	http://keekerdc.com/2011/03/hexagon-grids-coordinate-systems-and-distance-calculations/
+	 * @param destination
+	 * @return an int for the distance
+	 */
+	public int hexDistanceTo(HantoCoordinateImpl destination) {		
+		int z = Math.abs(0 - x - y);
+		int zDestination = Math.abs(0 - destination.getX() - destination.getY());
+		int dx = Math.abs(destination.getX() - x);
+		int dy = Math.abs(destination.getY() - y);
+		int dz = Math.abs(zDestination - z);
+		int answer = Math.max(Math.max(dx, dy), dz);
+		return answer;
+	}
 	
+	/**
+	 * 
+	 * @param destination
+	 * @return the HantoDirection of the destination
+	 */
+	public HantoDirection getDirectionTo(HantoCoordinateImpl destination){
+		HantoDirection answer = null;
+		int z = 0 - x - y;
+		int zDestination = 0 - destination.getX() - destination.getY();
+		int dx = destination.getX() - x;
+		int dy = destination.getY() - y;
+		int dz = zDestination - z;
+		
+		if (dz == 0){	
+			if (dx > 0){
+				answer = HantoDirection.SE; // (1, -1)
+			}
+			else {
+				answer = HantoDirection.NW; // (-1, 1)
+			}
+		}
+		else if (dy == 0){
+			if (dx > 0){
+				answer = HantoDirection.NE; // (1, 0)
+			}
+			else {
+				answer = HantoDirection.SW; // (-1, 0)
+			}
+		}
+		else if (dx == 0){
+			if (dy > 0){
+				answer = HantoDirection.N; // (0, 1)
+			}
+			else {
+				answer = HantoDirection.S; // (0, -1)
+			}
+		}
+		return answer;
+	}
+	
+	//=========================================================================================
+	// Adjacency
+		
 	/**
 	 * Check if two coordinates are adjacent.
 	 * @param coord1 the first coordinate
@@ -151,6 +201,18 @@ public class HantoCoordinateImpl implements HantoCoordinate
 		return answer;
 	}
 
-
+	/**
+	 * Get the set of all possible valid destinations for a move
+	 * @param board
+	 * @return the set of all adjacent hexes to a board's pieces
+	 */
+	public static Set<HantoCoordinateImpl> getAllAdjacentHexes(Set<HantoCoordinateImpl> board){
+		Set<HantoCoordinateImpl> answer = new HashSet<HantoCoordinateImpl>();
+		for (HantoCoordinateImpl hex : board){
+			answer.addAll(hex.getAdjacentHexes()); // Sets automatically take care of duplicates
+		}
+		answer.removeAll(board);		
+		return answer;
+	}
 	
 }

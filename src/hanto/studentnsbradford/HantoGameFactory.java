@@ -1,19 +1,13 @@
-/*******************************************************************************
- * This files was developed for CS4233: Object-Oriented Analysis & Design.
- * The course was taken at Worcester Polytechnic Institute.
- *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *******************************************************************************/
-
+/**
+ * @author Nicholas
+ */
 package hanto.studentnsbradford;
 
 import hanto.common.*;
 import hanto.studentnsbradford.alpha.AlphaHantoGame;
 import hanto.studentnsbradford.beta.BetaHantoGame;
 import hanto.studentnsbradford.delta.DeltaHantoGame;
+import hanto.studentnsbradford.epsilon.EpsilonHantoGame;
 import hanto.studentnsbradford.gamma.GammaHantoGame;
 
 /**
@@ -75,6 +69,8 @@ public class HantoGameFactory
 			case DELTA_HANTO:
 				game = new DeltaHantoGame(movesFirst);
 				break;
+			case EPSILON_HANTO:
+				game = new EpsilonHantoGame(movesFirst);
 			default:
 				break;
 		}

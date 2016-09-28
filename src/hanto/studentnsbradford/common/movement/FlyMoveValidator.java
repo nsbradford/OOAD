@@ -1,5 +1,5 @@
 /**
- * 
+ * @author Nicholas
  */
 package hanto.studentnsbradford.common.movement;
 
@@ -36,8 +36,9 @@ public class FlyMoveValidator extends MoveValidator {
 	}
 	
 	/* (non-Javadoc)
-	 * @see hanto.studentnsbradford.common.movement.MoveValidatorStrategy#isValidMove(hanto.common.HantoPieceType, hanto.common.HantoPlayerColor, 
-	 * java.util.Map, hanto.studentnsbradford.common.HantoCoordinateImpl, hanto.studentnsbradford.common.HantoCoordinateImpl)
+	 * @see hanto.studentnsbradford.common.movement.MoveValidatorStrategy#isValidMove(hanto.common.HantoPieceType, 
+	 * hanto.common.HantoPlayerColor, java.util.Map, hanto.studentnsbradford.common.HantoCoordinateImpl, 
+	 * hanto.studentnsbradford.common.HantoCoordinateImpl)
 	 */
 	@Override
 	public boolean isValidMove(HantoPieceType pieceType, HantoPlayerColor color,
@@ -45,20 +46,6 @@ public class FlyMoveValidator extends MoveValidator {
 			HantoCoordinateImpl source, HantoCoordinateImpl destination) 
 	{
 		return (isValidStandardMove(pieceType, color, board, source, destination) &&
-				maxDistance > getHexagonalDistance(source, destination));
+				maxDistance >= source.hexDistanceTo(destination));
 	}
-	
-	/**
-	 * Get the Manhattan(?) distance between two coordinates on the hex grid
-	 * @param source
-	 * @param destination
-	 * @return an int for the distance
-	 */
-	public static int getHexagonalDistance(HantoCoordinateImpl source, 
-			HantoCoordinateImpl destination)
-	{
-		// TODO 
-		return 0;
-	}
-
 }

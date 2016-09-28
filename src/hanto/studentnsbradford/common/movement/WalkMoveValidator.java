@@ -1,5 +1,5 @@
 /**
- * 
+ * @author Nicholas
  */
 package hanto.studentnsbradford.common.movement;
 
@@ -110,8 +110,8 @@ public class WalkMoveValidator extends MoveValidator {
 			Map<HantoCoordinateImpl, HantoPiece> board,
 			HantoCoordinateImpl source, HantoCoordinateImpl destination)
 	{
-		return !(	!isValidStandardMove(pieceType, color, board, source, destination) ||
-					!isValidPath(board, source, destination, maxDistance));
+		return (isValidStandardMove(pieceType, color, board, source, destination) &&
+				isValidPath(board, source, destination, maxDistance));
 	}
 
 
@@ -162,8 +162,6 @@ public class WalkMoveValidator extends MoveValidator {
 			Node current = queue.remove();
 			Set<Node> children = getAllUnvisitedChildNodes(current, graph.keySet());
 			
-			// TODO have to check for contiguous board configuration too!
-			
 			for (Node child : children){
 				if (child.pathLength > maxDepth){
 					break;
@@ -198,10 +196,11 @@ public class WalkMoveValidator extends MoveValidator {
 		adjacent.removeAll(graph); // reduce list to only unoccupied hexes
 				
 		for (HantoCoordinateImpl child : adjacent){
-			// for testing, add the child and then remove it
+			
 			if (child.isAdjacentToOccupiedHex(tmpGraph) && 
 				isEnoughSpaceToSlide(tmpGraph, parent.hex, child))
 			{
+				// for testing, add the child and then remove it
 				tmpGraph.add(child);
 				if (MoveValidator.isContinuousConfiguration(tmpGraph)){
 					children.add(new Node(child, parent.pathLength + 1));

@@ -1,7 +1,6 @@
 /**
- * @author Nicholas S. Bradford
+ * @author Nicholas
  */
-
 package hanto.studentnsbradford.gamma;
 
 import static hanto.common.HantoPieceType.BUTTERFLY;

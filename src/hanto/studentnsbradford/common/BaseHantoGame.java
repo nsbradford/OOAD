@@ -1,5 +1,5 @@
 /**
- * 
+ * @author Nicholas
  */
 package hanto.studentnsbradford.common;
 
@@ -21,6 +21,7 @@ import hanto.common.HantoPieceType;
 import hanto.common.HantoPlayerColor;
 import hanto.common.MoveResult;
 import hanto.studentnsbradford.common.movement.MoveValidator;
+import hanto.tournament.HantoMoveRecord;
 
 /**
  * @author Nicholas
@@ -48,14 +49,17 @@ public abstract class BaseHantoGame implements HantoGame {
 			"Each side must place their Butterfly on or before their 4th turn.";
 	public static final String messageInvalidMove = "Invalid move.";
 	public static final String messageNullDestination = "Cannot have a null move destination.";
-	
-	// constants
-	public static final HantoCoordinate origin = new HantoCoordinateImpl(0, 0);
+	public static final HantoCoordinateImpl origin = new HantoCoordinateImpl(0, 0);
+		
+
+	// constant once initialized and confirmed by the subclass
 	protected HantoPieceType[] startingPieces;
 	protected Map<HantoPieceType, Set <MoveValidator>> moveValidators;
+	protected int maxMovesInGame;
+	protected int numMovesBeforeButterfly;
+	protected boolean isResignationAllowed;
 	
 	// private member variables
-	protected boolean isResignationAllowed;
 	protected boolean isGameOver;
 	protected int numMoves;
 	protected HantoPlayerColor activePlayerColor;
@@ -63,17 +67,16 @@ public abstract class BaseHantoGame implements HantoGame {
 	protected Map<HantoPlayerColor, List<HantoPieceType>> playerInactivePieces;
 	protected Map<HantoPlayerColor, HantoCoordinateImpl> playerButterflyLocations;
 	
-	protected int maxMovesInGame;
-	protected int numMovesBeforeButterfly;
-	
 	/**
 	 * Constructor for BaseHantoGame
 	 * @param movesFirst
 	 */
 	protected BaseHantoGame(HantoPlayerColor movesFirst) {
+		maxMovesInGame = Integer.MAX_VALUE; // "infinite"
+		numMovesBeforeButterfly = 6;
 		isResignationAllowed = true;
 		isGameOver = false;
-		numMoves = 0;
+		numMoves = 1;
 		activePlayerColor = movesFirst;
 		board = new HashMap<HantoCoordinateImpl, HantoPiece>();
 		playerButterflyLocations = new HashMap<HantoPlayerColor, HantoCoordinateImpl>();
@@ -85,44 +88,49 @@ public abstract class BaseHantoGame implements HantoGame {
 			moveValidators.put(type, new HashSet<MoveValidator>());
 		}
 	}
-
+	
 	//=============================================================================================
 	// API
 
+	/**
+	 * Use the makeMove() from HantoGame
+	 * @param move
+	 * @return the result of the move
+	 * @throws HantoException
+	 */
+	public MoveResult makeMove(HantoMoveRecord move) throws HantoException{
+		return makeMove(move.getPiece(), move.getFrom(), move.getTo());
+	}
+	
+	/* (non-Javadoc)
+	 * @see hanto.common.HantoGame#makeMove(hanto.common.HantoPieceType, 
+	 * hanto.common.HantoCoordinate, hanto.common.HantoCoordinate)
+	 */
 	@Override
 	public MoveResult makeMove(HantoPieceType pieceType, HantoCoordinate from, 
 			HantoCoordinate to) throws HantoException
 	{
-		numMoves++;
 		
-		if (isResignationAllowed && !isGameOver && pieceType == null && from == null && to == null){
+		if (isResignation(pieceType, from, to)){
 			isGameOver = true;
 			return activePlayerColor == BLUE ? MoveResult.RED_WINS : MoveResult.BLUE_WINS;
 		}
-				
+		checkNullParams(pieceType, to);
+		
 		HantoCoordinateImpl source = null;
 		HantoCoordinateImpl destination = null;
 		HantoPieceImpl piece = null;
 		if (from != null){
 			source = new HantoCoordinateImpl(from);
 		}
-		if (to == null){
-			throw new HantoException(messageNullDestination);
-		}
-		else {
-			destination = new HantoCoordinateImpl(to);
-		}
-		if (pieceType != null){
-			piece = new HantoPieceImpl(activePlayerColor, pieceType, moveValidators.get(pieceType));
-		}
-		else {
-			throw new HantoException(messageInvalidMove);
-		}
-		
+		destination = new HantoCoordinateImpl(to);
+		piece = new HantoPieceImpl(activePlayerColor, pieceType, moveValidators.get(pieceType));
+
 		standardValidation(piece, source, destination);
-		validateMove(piece, source, destination);
+		validateMoveForPiece(piece, source, destination);
 		updateBoard(piece, source, destination);
 		updateActivePlayerColor();
+		numMoves++;
 		return getVictoryStatus();
 	}
 	
@@ -145,40 +153,84 @@ public abstract class BaseHantoGame implements HantoGame {
 		final StringBuilder builder = new StringBuilder("Board: \n");
 		for (HantoCoordinateImpl hex : board.keySet()){
 			builder.append(hex.toString());
+			builder.append(board.get(hex).toString());
 			builder.append('\n');
 		}
 		return builder.toString();
 	}
 	
 	//=============================================================================================
-	// Non-static helper functions
+	// Validation
 	
 	/**
-	 * alter the board and the set of remaining pieces to place
-	 * @param piece
-	 * @param source
-	 * @param destination
+	 * Check if a move is valid.
+	 * @param pieceType
+	 * @param from
+	 * @param to
+	 * @return whether the given move is valid
 	 */
-	protected void updateBoard(HantoPieceImpl piece, HantoCoordinateImpl source,
-			HantoCoordinateImpl destination)
+	private boolean isValidMove(HantoPieceType pieceType, HantoCoordinate from, 
+			HantoCoordinate to)
 	{
-		if (source == null){
-			playerInactivePieces.get(activePlayerColor).remove(piece.getType());
+		boolean answer = false;
+		try {
+			checkNullParams(pieceType, to);
+			HantoCoordinateImpl source = null;
+			HantoCoordinateImpl destination = null;
+			HantoPieceImpl piece = null;
+			if (from != null){
+				source = new HantoCoordinateImpl(from);
+			}
+			destination = new HantoCoordinateImpl(to);
+			piece = new HantoPieceImpl(activePlayerColor, pieceType, moveValidators.get(pieceType));
+
+			standardValidation(piece, source, destination);
+			validateMoveForPiece(piece, source, destination);
+			answer = true;
 		}
-		else{
-			board.remove(source);
+		catch (HantoException e){
+			answer = false;
 		}
-		board.put(destination, piece);
-		
-		if (piece.getType() == HantoPieceType.BUTTERFLY){
-			playerButterflyLocations.put(activePlayerColor, destination);
+		return answer;
+	}
+	
+	/**
+	 * 
+	 * @param pieceType
+	 * @param from
+	 * @param to
+	 * @return whether all params are null
+	 * @throws HantoException
+	 */
+	protected boolean isResignation(HantoPieceType pieceType, HantoCoordinate from, 
+			HantoCoordinate to) throws HantoException
+	{
+		boolean answer = false;
+		if (isResignationAllowed && !isGameOver && pieceType == null && from == null && to == null)
+		{
+			answer = true;
+		}
+		return answer;
+	}
+	
+	/**
+	 * Check for null params
+	 * @param pieceType
+	 * @param to
+	 * @throws HantoException
+	 */
+	private static void checkNullParams(HantoPieceType pieceType, HantoCoordinate to) 
+			throws HantoException
+	{
+		if (to == null){
+			throw new HantoException(messageNullDestination);
+		}
+		if (pieceType == null) {
+			throw new HantoException(messageInvalidMove);
 		}
 	}
 	
-
-	
-	//=============================================================================================
-	// Validation
+		
 	
 	/**
 	 * 
@@ -187,7 +239,7 @@ public abstract class BaseHantoGame implements HantoGame {
 	 * @param destination
 	 * @throws HantoException
 	 */
-	protected void validateMove(HantoPieceImpl piece, HantoCoordinateImpl source,
+	protected void validateMoveForPiece(HantoPieceImpl piece, HantoCoordinateImpl source,
 			HantoCoordinateImpl destination) throws HantoException 
 	{
 		piece.validateMove(board, source, destination);
@@ -242,6 +294,28 @@ public abstract class BaseHantoGame implements HantoGame {
 	// Non-static helper functions
 	
 	/**
+	 * alter the board and the set of remaining pieces to place
+	 * @param piece
+	 * @param source
+	 * @param destination
+	 */
+	protected void updateBoard(HantoPieceImpl piece, HantoCoordinateImpl source,
+			HantoCoordinateImpl destination)
+	{
+		if (source == null){
+			playerInactivePieces.get(activePlayerColor).remove(piece.getType());
+		}
+		else{
+			board.remove(source);
+		}
+		board.put(destination, piece);
+		
+		if (piece.getType() == HantoPieceType.BUTTERFLY){
+			playerButterflyLocations.put(activePlayerColor, destination);
+		}
+	}
+	
+	/**
 	 * Switch the active Player.
 	 */
 	protected void updateActivePlayerColor(){
@@ -252,7 +326,6 @@ public abstract class BaseHantoGame implements HantoGame {
 			activePlayerColor = BLUE;
 		}
 	}
-	
 	
 	/**
 	 * Called after every move to test the win conditions.
@@ -275,7 +348,7 @@ public abstract class BaseHantoGame implements HantoGame {
 			answer = MoveResult.RED_WINS;
 			isGameOver = true;
 		}
-		else if (numMoves >= maxMovesInGame){
+		else if (numMoves > maxMovesInGame){
 			answer = MoveResult.DRAW;
 			isGameOver = true;
 		}
@@ -293,11 +366,100 @@ public abstract class BaseHantoGame implements HantoGame {
 		if (butterflyLoc == null){
 			return false;
 		}
+		return numSurroundingButterfly(butterflyLoc, playerColor, board) == 6 ? true : false;
+	}
+	
+	/**
+	 * Get the number of pieces surrounding a particular color's butterfly
+	 * @param butterflyLoc
+	 * @param playerColor
+	 * @param board
+	 * @return the number of surrounding pieces
+	 */
+	public static int numSurroundingButterfly(HantoCoordinateImpl butterflyLoc,
+			HantoPlayerColor playerColor, Map<HantoCoordinateImpl, HantoPiece> board)
+	{
 		final Set<HantoCoordinateImpl> surroundingHexes = butterflyLoc.getAdjacentHexes();
+		surroundingHexes.retainAll(board.keySet());
+		return surroundingHexes.size();
+	}
+	
+	//=============================================================================================
+	// Getting possible moves
+	
+	/**
+	 * Overload allowing a simpler call for this current game state.
+	 * @return valid possibilites for the next move
+	 */
+	public Set<HantoMoveRecord> getValidMoves() {
+		return getValidMoves(activePlayerColor, board, playerInactivePieces);
+	}
+	
+	/**
+	 * Get all possible valid moves for the current game state.
+	 * @param color
+	 * @param board
+	 * @param playerInactivePieces
+	 * @return valid possibilites for the next move
+	 */
+	public Set<HantoMoveRecord> getValidMoves(HantoPlayerColor color, 
+			Map<HantoCoordinateImpl, HantoPiece> board, 
+			Map<HantoPlayerColor, List<HantoPieceType>> playerInactivePieces)
+	{
+		// needs to store the piece type, and source hex
+		Set<HantoMoveRecord> answer = new HashSet<HantoMoveRecord>();
+		Set<HantoMoveRecord> potentialSources = new HashSet<HantoMoveRecord>();
 		
-		// reduce list to only unoccupied hexes
-		surroundingHexes.removeAll(board.keySet());
+		// potential movement
+		for (HantoCoordinateImpl source : board.keySet()){
+			if (board.get(source).getColor() == color){
+				potentialSources.add(new HantoMoveRecord(board.get(source).getType(), source, null));
+			}
+		}
+		// potential placement
+		for (HantoPieceType pieceType : playerInactivePieces.get(color)){
+			potentialSources.add(new HantoMoveRecord(pieceType, null, null));
+		}
 		
-		return surroundingHexes.size() > 0 ? false : true;
+		// potential destinations
+		Set<HantoCoordinateImpl> potentialDestinations = 
+				HantoCoordinateImpl.getAllAdjacentHexes(board.keySet());
+		if (board.isEmpty()){
+			potentialDestinations.add(origin);
+		}
+		
+		// now, check for all possible source-destination combinations
+		for (HantoMoveRecord move : potentialSources){
+			for (HantoCoordinateImpl destination : potentialDestinations){
+				HantoMoveRecord potentialMove = new HantoMoveRecord(move.getPiece(), move.getFrom(), destination);
+				if (isValidMove(move.getPiece(), move.getFrom(), destination)){
+					answer.add(potentialMove); // needs piece, source, destination
+				}
+			}
+		}
+		return answer;	
+	}
+		
+	//=============================================================================================
+	// Help with player's predictions
+	
+	/**
+	 * Execute a board on the given board.
+	 * @param move
+	 * @param myColor
+	 * @return the future board state
+	 */
+	public Map<HantoCoordinateImpl, HantoPiece> getFutureBoard(HantoMoveRecord move, 
+			HantoPlayerColor myColor)
+	{
+		Map<HantoCoordinateImpl, HantoPiece> futureBoard = 
+				new HashMap<HantoCoordinateImpl, HantoPiece>(board);
+		
+		if (move.getFrom() != null){
+			futureBoard.remove(move.getFrom());
+		}
+		futureBoard.put(new HantoCoordinateImpl(move.getTo()), 
+				new HantoPieceImpl(myColor, move.getPiece()));
+		return futureBoard;
 	}
 }
